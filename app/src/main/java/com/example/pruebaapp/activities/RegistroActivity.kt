@@ -41,7 +41,7 @@ class RegistroActivity : AppCompatActivity() {
     private fun registro() {
         val nombre = binding.textFieldName.text.toString()
         val apellido = binding.textFieldLastname.text.toString()
-        val rut = binding.textFieldPassword.text.toString()
+        val rut = binding.textRut.text.toString()
         val telefono = binding.textFieldPhone.text.toString()
         val correo = binding.textFieldEmail.text.toString()
         val contrasena = binding.textFieldPassword.text.toString()
@@ -74,6 +74,7 @@ class RegistroActivity : AppCompatActivity() {
                             "Registro exitoso",
                             Toast.LENGTH_SHORT
                         ).show()
+                        goToSesion()
                     }
                 } else {
                     it
@@ -105,7 +106,7 @@ class RegistroActivity : AppCompatActivity() {
             Toast.makeText(this, "Ingrese su apellido", Toast.LENGTH_SHORT).show()
             return false
         }
-        if (rut.isEmpty()) {
+        if (!validarRut(rut)) {
             Toast.makeText(this, "Ingrese su Rut", Toast.LENGTH_SHORT).show()
             return false
         }
@@ -148,6 +149,43 @@ class RegistroActivity : AppCompatActivity() {
     fun validarCorreo(email: String): Boolean {
         return Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
+
+    fun validarRut(rut: String): Boolean {
+        val rutClean = rut.replace(".", "").replace("-", "") // Elimina puntos y guión
+        if (rutClean.length < 8 || rutClean.length > 9) return false // Longitud inválida
+
+        val rutBody = rutClean.dropLast(1) // Extraer el cuerpo del RUT
+        val dv = rutClean.takeLast(1) // Extraer el dígito verificador
+
+        // Validar que el cuerpo del RUT sea numérico
+        if (!rutBody.all { it.isDigit() }) return false
+
+        val dvCalculated = calculateDV(rutBody.toInt()) // Calcular el dígito verificador esperado
+
+        // Comprobar si el dígito verificador calculado coincide con el ingresado
+        return dv.equals(dvCalculated, ignoreCase = true)
+    }
+
+    fun calculateDV(rut: Int): String {
+        var num = rut
+        var multiplier = 2
+        var sum = 0
+
+        while (num > 0) {
+            sum += (num % 10) * multiplier
+            num /= 10
+            multiplier = if (multiplier == 7) 2 else multiplier + 1
+        }
+
+        val remainder = 11 - (sum % 11)
+
+        return when (remainder) {
+            11 -> "0"
+            10 -> "K"
+            else -> remainder.toString()
+        }
+    }
+
 }
 
 
