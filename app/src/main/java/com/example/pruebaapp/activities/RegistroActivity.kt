@@ -2,6 +2,7 @@ package com.example.pruebaapp.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Patterns
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -34,7 +35,7 @@ class RegistroActivity : AppCompatActivity() {
         }
 
         binding.btnInicio.setOnClickListener { goToSesion() }
-        binding.btnRegistrate.setOnClickListener { goToRegistro() }
+        binding.btnRegistrate.setOnClickListener { registro() }
     }
 
     private fun registro() {
@@ -75,6 +76,7 @@ class RegistroActivity : AppCompatActivity() {
                         ).show()
                     }
                 } else {
+                    it
                     Toast.makeText(
                         this@RegistroActivity,
                         "Registro fallido ${it.exception.toString()}",
@@ -111,7 +113,7 @@ class RegistroActivity : AppCompatActivity() {
             Toast.makeText(this, "Ingrese su teléfono", Toast.LENGTH_SHORT).show()
             return false
         }
-        if (correo.isEmpty()) {
+        if (!validarCorreo(correo)) {
             Toast.makeText(this, "Ingrese su correo", Toast.LENGTH_SHORT).show()
             return false
         }
@@ -143,12 +145,9 @@ class RegistroActivity : AppCompatActivity() {
         startActivity(i)
     }
 
-    private fun goToRegistro() {
-        val i = Intent(this, RegistroActivity::class.java)
-        startActivity(i)
+    fun validarCorreo(email: String): Boolean {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
-
-
 }
 
 
